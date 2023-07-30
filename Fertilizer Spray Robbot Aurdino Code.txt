@@ -1,0 +1,98 @@
+#define ls 10//Enable L298 Pin right side
+#define rf 9 //right  foward 
+#define rb 8 //right  backward
+#define lb 7 //left  backward
+#define lf 6 //left  foward
+#define rs 5 //Enable L298 Pin left side
+
+#define R_S A0 //ir sensor Right
+#define L_S A1 //ir sensor Left
+
+char Incoming_value = 0;
+
+int mode;
+
+void setup(){ // put your setup code here, to run once
+
+Serial.begin(9600);         
+//pinMode(13, OUTPUT);       
+
+pinMode(R_S, INPUT); // declare if sensor as input  
+pinMode(L_S, INPUT); // declare ir sensor as input
+
+pinMode(ls, OUTPUT); // declare as output for L298 Pin enA 
+pinMode(rf, OUTPUT); // declare as output for L298 Pin in1 
+pinMode(rb, OUTPUT); // declare as output for L298 Pin in2 
+pinMode(lb, OUTPUT); // declare as output for L298 Pin in3   
+pinMode(lf, OUTPUT); // declare as output for L298 Pin in4 
+pinMode(rs, OUTPUT); // declare as output for L298 Pin enB 
+
+//analogWrite(ls, 150); // Write The Duty Cycle 0 to 255 Enable Pin A for Motor1 Speed 
+//analogWrite(rs, 150); // Write The Duty Cycle 0 to 255 Enable Pin B for Motor2 Speed 
+delay(1000);
+}
+void loop(){  
+    
+if(Serial.available() > 0)  {  
+    Incoming_value = Serial.read(); 
+    if(Incoming_value == 'w'){ mode=1;}
+    else if(Incoming_value == 'v'){mode=0;}
+    else if(Incoming_value == 'f'){mode=2;}
+    else if(Incoming_value == 'b'){mode=3;}
+    else if(Incoming_value == 'l'){mode=4;}
+    else if(Incoming_value == 'r'){mode=5;}}
+
+      if(mode==1){
+if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 0)){forword();}   //if Right Sensor and Left Sensor are at White color then it will call forword function
+
+if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 0)){turnRight();} //if Right Sensor is Black and Left Sensor is White then it will call turn Right function  
+
+if((digitalRead(R_S) == 0)&&(digitalRead(L_S) == 1)){turnLeft();}  //if Right Sensor is White and Left Sensor is Black then it will call turn Left function
+
+if((digitalRead(R_S) == 1)&&(digitalRead(L_S) == 1)){Stop();} //if Right Sensor and Left Sensor are at Black color then it will call Stop function
+      }
+      else if(mode==0){Stop();}
+      else if(mode==2){forword();}
+      else if(mode==3){backword();}
+      else if(mode==4){turnLeft();}
+      else if(mode==5){turnRight();}
+}
+
+
+
+void forword(){  //forword
+//analogWrite(rs, 254);
+//analogWrite(ls, 254);
+digitalWrite(rf, HIGH); //Right Motor forword Pin 
+digitalWrite(rb, LOW);  //Right Motor backword Pin 
+digitalWrite(lb, LOW);  //Left Motor backword Pin 
+digitalWrite(lf, HIGH); //Left Motor forword Pin 
+}
+
+void turnRight(){ //turnRight
+digitalWrite(rf, LOW);  //Right Motor forword Pin 
+digitalWrite(rb, HIGH); //Right Motor backword Pin  
+digitalWrite(lb, LOW);  //Left Motor backword Pin 
+digitalWrite(lf, HIGH); //Left Motor forword Pin 
+}
+
+void turnLeft(){ //turnLeft
+digitalWrite(rf, HIGH); //Right Motor forword Pin 
+digitalWrite(rb, LOW);  //Right Motor backword Pin 
+digitalWrite(lb, HIGH); //Left Motor backword Pin 
+digitalWrite(lf, LOW);  //Left Motor forword Pin 
+}
+
+void Stop(){ //stop
+digitalWrite(rf, LOW); //Right Motor forword Pin 
+digitalWrite(rb, LOW); //Right Motor backword Pin 
+digitalWrite(lb, LOW); //Left Motor backword Pin 
+digitalWrite(lf, LOW); //Left Motor forword Pin 
+}
+
+void backword(){ //stop
+digitalWrite(rf, LOW); //Right Motor forword Pin 
+digitalWrite(rb, HIGH); //Right Motor backword Pin 
+digitalWrite(lb, HIGH); //Left Motor backword Pin 
+digitalWrite(lf, LOW); //Left Motor forword Pin 
+}
